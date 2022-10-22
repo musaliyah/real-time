@@ -67,5 +67,42 @@ const thoughtController = {
                 res.status(404).json({message: 'No thoughts in our system match that id'});
                 return;
             }
+            res.json(dbThoughtData);
+        }).catch(err => res.json(err));
+    },
+
+    deleteThought({params}, res) {
+        Thought.findOneAndDelete({_id: params.id})
+        .then(dbThoughtData => {
+            if(!dbThoughtData) {
+                res.status(404).json({message: 'No thoughts in our system match that id'});
+                return;
+            }
+            return User.findOneAndUpdate(
+                {_id: params.userId},
+                {$pull: {thought: params.Id}},
+                {new: true}
+            )
+        }) .then(dbUserData => {
+            if(!dbUserData) {
+                res.status(404).json({message: 'No user in our system matches this id'});
+                return;
+            }
+            res.json(dbUserData);
         })
-}
+        .catch(err => res.json(err));
+    },
+    createReaction({params, body}, res) {
+        Thought.findOneAndUpdate(
+            {_id: params.thoughtId},
+            {$push: {reactions: body}},
+            {new: true, runValidators: true}).populate({
+                path: 'reactions', 
+                select: '-__v'
+            }).select('-__v')
+            .then(dbThoughtData => {
+                if(!dbThoughtData) {
+                    res.status(404).json({message: 'no thoughts in our system match this ID'})
+                }
+            })
+    }
