@@ -1,7 +1,7 @@
 const {User, Thought} = require('../models');
 
 const userController = {
-getAllUsers(req, res){
+getAllUser(req, res){
     User.find({}).select('-__v')
     .sort({_id: -1})
     .then(dbUserData => res.json(dbUserData))
@@ -67,7 +67,7 @@ deleteUser({params}, res){
 addFriend({params}, res) {
     User.findOneAndUpdate(
         {_id: params.userId},
-        {$push: {friends: params.friendId}},
+        delete{$push: {friends: params.friendId}},
         {new: true}
     ).then((dbUserData) => {
         if(!dbUserData) {
